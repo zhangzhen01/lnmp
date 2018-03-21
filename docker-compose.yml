@@ -1,0 +1,44 @@
+version: "2"
+services:
+        mysql:  
+            image: mysql  
+            volumes:  
+              - ./dbdata:/var/lib/mysql  
+            ports:  
+              - "3306:3306"  
+            environment:  
+              MYSQL_USER: root  
+              MYSQL_PASSWORD: 12netwyw#&*  
+              MYSQL_ROOT_PASSWORD: 12netwyw#&*  
+            # network_mode: "host"
+
+        phpfpm:
+                image: registry.cn-hangzhou.aliyuncs.com/netbankzgg/phpfpm:withredis
+                ports:
+                - "9000:9000"
+                # network_mode: "host"
+                links:
+                - mysql:mysql
+                # environment:
+                #   - MONGODB_IP=172.27.0.2
+                #   - MONGODB_PORT=27017
+                volumes:
+                - ./html:/var/www/html
+                - ./php-fpm/php-fpm.d:/usr/local/etc/php-fpm.d
+                command: /usr/local/sbin/php-fpm
+        nginx:
+                image: nginx
+                ports:
+                - "80:80"
+                - "9200:9200"
+                # network_mode: "host"
+                links:
+                - phpfpm:phpfpm
+                volumes:
+                - ./nginx/conf.d:/etc/nginx/conf.d/
+                - ./html:/var/www/html
+
+
+                
+
+
